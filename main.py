@@ -1,9 +1,11 @@
 import time
+import pvporcupine
 
 keepRuning = True
 currentFace = "None"
 global output
 output = "Error"
+handle = pvporcupine.create(keywords=['picovoice'])
 
 #Face code
 
@@ -27,8 +29,16 @@ def getTime():
 def printDataOut():
   print(str(output))
   
+def get_next_audio_frame():
+  pass
+  
   #Now for the fun stuff
 while keepRuning == True:
   print("Main loop goes here")
-  getWeather()
+  keyword_index = handle.process(get_next_audio_frame())
+  if keyword_index >=0:
+    handel.delete()
+    #inset get command stt here
+    print("got hotword!")
+    pass
   
