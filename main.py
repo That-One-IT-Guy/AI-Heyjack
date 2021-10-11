@@ -1,11 +1,14 @@
 import time
 import pvporcupine
+import speech_recognition as sr
+
 
 keepRuning = True
 currentFace = "None"
 global output
 output = "Error"
 handle = pvporcupine.create(keywords=['picovoice'])
+r = sr.Recognizer()
 
 #Face code
 
@@ -38,6 +41,10 @@ while keepRuning == True:
   keyword_index = handle.process(get_next_audio_frame())
   if keyword_index >=0:
     handel.delete()
+    with sr.Microphone() as source:
+    print("Talk")
+    audio_text = r.listen(source)
+    print("Time over, thanks")
     #inset get command stt here
     print("got hotword!")
     pass
