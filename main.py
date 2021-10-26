@@ -42,8 +42,10 @@ def getWeather():
     weather = weather[0]
     weather = weather['description']
     output = ("The weather is " + str(weather) + " with a temperture of " + str(int(temperature)) + " degrees.")
+  elif response.status_code == 401:
+    output = "Error getting the weather, check your openweathermap API code. Try again later. code = 401"
   else:
-    output = "Error while getting weather! (Do you have a internet connection?)"
+    output = "Error while getting weather! (Do you have a internet connection?) code = " + str(response.status_code)
   printDataOut()
 
 def getTime():
@@ -59,11 +61,20 @@ def printDataOut():
 def get_next_audio_frame():
   pass
   
+def sayoutput():
+  global output
+  #tts code goes here
+  
   #Now for the fun stuff
 while keepRuning == True:
-  print("Main loop goes here")
-  getWeather()
-  time.sleep(100)
+  inputType = input("Would you like the (W)eather or the (T) time?")
+  if inputType == "W":
+    getWeather()
+  elif inputType == "T":
+    getTime()
+  else:
+    output = "Error, wrong command"
+    printDataOut()
   # keyword_index = handle.process(get_next_audio_frame())
   # if keyword_index >=0:
   #   handel.delete()
