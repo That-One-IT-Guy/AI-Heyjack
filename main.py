@@ -1,8 +1,9 @@
 from datetime import datetime
 import time
 import requests, json
-#import pvporcupine
+import pvporcupine
 #import speech_recognition as sr
+import pyttsx3
 
 
 keepRuning = True
@@ -14,9 +15,14 @@ output = "Error"
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
 CITY = "Kansas City"
 global API_KEY 
-API_KEY = "82a239137d8704a9310012b355421da8"
+#API_KEY = "82a239137d8704a9310012b355421da8"
+API_KEY = "7016307649b684cba0afd346d3901f6c"
 global URL 
 URL = BASE_URL + "q=" + CITY + "&appid=" + API_KEY
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+engine.setProperty('rate', 140)
 
 #Face code
 
@@ -51,19 +57,24 @@ def getWeather():
 def getTime():
   global output
   now = datetime.now()
-  current_time = now.strftime("%H:%M:%S")
-  output = ("The curent time is, " + (str(current_time)))
+  current_time = now.strftime("%H %M")
+  output = ("The current time is, " + (str(current_time)))
   printDataOut()
   
+
+  #testing purposes only!
 def printDataOut():
   print(str(output))
+  print("Sending to tts!")
+  sayoutput()
   
 def get_next_audio_frame():
   pass
   
 def sayoutput():
   global output
-  #tts code goes here
+  engine.say(str(output))
+  engine.runAndWait()
   
   #Now for the fun stuff
 while keepRuning == True:
