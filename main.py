@@ -10,6 +10,7 @@ import speech_recognition as sr
 import pygame
 from pygame.locals import *
 import random
+from threading import Thread
 
 pygame.init()
 
@@ -58,38 +59,36 @@ def uirun():
     ih = carImg.get_height()
     iw = carImg.get_width()
     font = pygame.font.Font('Amfallen.ttf', 32)
-    text = font.render(str(output), True, (a,a,a))
+    text = font.render('Hello there!', True, (a,a,a))
     textRect = text.get_rect()
     th = th + 1
-    if not output == "":
-      if th > 100:  #slide up
-          th = 100
-          if ti <= 70:
-              if int(th) >= 99:   #wait 7 sec
-                  ti = ti + 1
-                  time.sleep(0.1)
-      if dim <= 255:     #dim away
-          if ti > 69:
-              print(("dim = ") + str(dim))
-              print("ti = " + str(ti))
-              a = a -1
-              dim = dim + 1
-              print("a =" + str(a))
-              if a == 0:
-                  print("reset")
-                  output = ""
-                  a = 255
-                  dim = 0
-                  ti = 0
-                  th = 0
+    if th > 100:  #slide up
+        th = 100
+        if ti <= 70:
+            if int(th) >= 99:   #wait 7 sec
+                ti = ti + 1
+                time.sleep(0.1)
+    if dim <= 255:     #dim away
+        if ti > 69:
+            print(("dim = ") + str(dim))
+            print("ti = " + str(ti))
+            a = a -1
+            dim = dim + 1
+            print("a =" + str(a))
+            if a == 0:
+                print("reset")
+                a = 255
+                dim = 0
+                ti = 0
+                th = 0
                       
               
-      textRect.center = (w // 2, h // 2 + ih/2 - th)
+    textRect.center = (w // 2, h // 2 + ih/2 - th)
 
-      screen.blit(carImg, ((w/2)-(iw/2),(h/2)-(ih/2)))
-      screen.blit(text, textRect)
-      # Flip the display
-      pygame.display.flip()
+    screen.blit(carImg, ((w/2)-(iw/2),(h/2)-(ih/2)))
+    screen.blit(text, textRect)
+    # Flip the display
+    pygame.display.flip()
 
 #Face code
 
@@ -151,10 +150,25 @@ def sayoutput():
   global output
   engine.say(str(output))
   engine.runAndWait()
-  uirun()
+  #uirun()
   
+def testIn():
+  while True:
+    testInput = input("D, T, W")
+    if testInput == "D":
+      dice()
+    elif testInput == "T":
+      getTime()
+    elif testInput == "W":
+      getWeather()
+    else:
+      print("Error try agian!")
 
-dice()
+if __name__ == '__main__':
+  Thread(target = uirun).start()
+  #Thread(target = testIn).start()
+
+
   #Now for the fun stuff
 # while keepRuning == True:
 #   try:
