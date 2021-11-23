@@ -4,7 +4,13 @@ import requests, json
 import pvporcupine
 #import speech_recognition as sr
 import pyttsx3
+import struct
+#import pyaudio
+import speech_recognition as sr
+import pygame
+from pygame.locals import *
 
+pygame.init()
 
 keepRuning = True
 currentFace = "None"
@@ -15,14 +21,74 @@ output = "Error"
 BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
 CITY = "Kansas City"
 global API_KEY 
-#API_KEY = "82a239137d8704a9310012b355421da8"
-API_KEY = "7016307649b684cba0afd346d3901f6c"
+API_KEY = "82a239137d8704a9310012b355421da8"
 global URL 
 URL = BASE_URL + "q=" + CITY + "&appid=" + API_KEY
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
 engine.setProperty('rate', 140)
+porcupine = None
+pa = None
+audio_stream = None
+
+#startup code
+
+screen = pygame.display.set_mode((500, 500), RESIZABLE)
+
+def uirun():
+  global output
+  running = True
+  th = 0
+  a = 255
+  ti = 0
+  dim = 0
+  while running:
+    w, h = pygame.display.get_surface().get_size()
+    # Did the user click the window close button?
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    # Fill the background with white
+    screen.fill((0, 0, 25))
+
+    # Draw img
+    carImg = pygame.image.load('aiui.gif')
+    ih = carImg.get_height()
+    iw = carImg.get_width()
+    font = pygame.font.Font('Amfallen.ttf', 32)
+    text = font.render(str(output), True, (a,a,a))
+    textRect = text.get_rect()
+    th = th + 1
+    if not output == "":
+      if th > 100:  #slide up
+          th = 100
+          if ti <= 70:
+              if int(th) >= 99:   #wait 7 sec
+                  ti = ti + 1
+                  time.sleep(0.1)
+      if dim <= 255:     #dim away
+          if ti > 69:
+              print(("dim = ") + str(dim))
+              print("ti = " + str(ti))
+              a = a -1
+              dim = dim + 1
+              print("a =" + str(a))
+              if a == 0:
+                  print("reset")
+                  output = ""
+                  a = 255
+                  dim = 0
+                  ti = 0
+                  th = 0
+                      
+              
+      textRect.center = (w // 2, h // 2 + ih/2 - th)
+
+      screen.blit(carImg, ((w/2)-(iw/2),(h/2)-(ih/2)))
+      screen.blit(text, textRect)
+      # Flip the display
+      pygame.display.flip()
 
 #Face code
 
@@ -57,7 +123,7 @@ def getWeather():
 def getTime():
   global output
   now = datetime.now()
-  current_time = now.strftime("%H %M")
+  current_time = now.strftime("%H" + ":" +"%M")
   output = ("The current time is, " + (str(current_time)))
   printDataOut()
   
@@ -75,25 +141,41 @@ def sayoutput():
   global output
   engine.say(str(output))
   engine.runAndWait()
+  uirun()
   
+
+getWeather()
   #Now for the fun stuff
-while keepRuning == True:
-  inputType = input("Would you like the (W)eather or the (T) time?")
-  if inputType == "W":
-    getWeather()
-  elif inputType == "T":
-    getTime()
-  else:
-    output = "Error, wrong command"
-    printDataOut()
-  # keyword_index = handle.process(get_next_audio_frame())
-  # if keyword_index >=0:
-  #   handel.delete()
-  #   with sr.Microphone() as source:
-  #     print("Talk")
-  #     audio_text = r.listen(source)
-  #     print("Time over, thanks")
-  #     #inset get command stt here
-  #     print("got hotword!")
-  #     pass
-  
+# while keepRuning == True:
+#   try:
+#    porcupine = pvporcupine.create(keywords=["picovoice", "blueberry"])
+#    pa = pyaudio.PyAudio()
+#    audio_stream = pa.open(
+#                     rate=porcupine.sample_rate,
+#                     channels=1,
+#                     format=pyaudio.paInt16,
+#                     input=True,
+#                     frames_per_buffer=porcupine.frame_length)
+#    while True:
+#      pcm = audio_stream.read(porcupine.frame_length)
+#      pcm = struct.unpack_from("h" * porcupine.frame_length, pcm)
+#      keyword_index = porcupine.process(pcm)
+#      if keyword_index >= 0:
+#             print("Hotword Detected, talk now!")
+#             r = sr.Recognizer()
+#             with sr.Microphone() as source:
+#               print("Say something!")
+#               audio = r.listen(source)
+#               voiceData = r.recognize_sphinx(audio)
+#               print(voiceData)
+#               if "weather" in str(voiceData):
+#                 getWeather()
+#               elif "time" in str(voiceData):
+#                 getTime()
+  # finally:
+  #   if porcupine is not None:
+  #     porcupine.delete()
+  #   if audio_stream is not None:
+  #     audio_stream.close()
+  #   if pa is not None:
+  #     pa.terminate()
