@@ -9,6 +9,7 @@ import struct
 import speech_recognition as sr
 import pygame
 from pygame.locals import *
+import random
 
 pygame.init()
 
@@ -127,6 +128,15 @@ def getTime():
   output = ("The current time is, " + (str(current_time)))
   printDataOut()
   
+def dice():
+  global output
+  role = random.randrange(1,6)
+  role = str(role)
+  output = ("Your dice roled on a " + role + "!")
+  printDataOut()
+
+
+
 
   #testing purposes only!
 def printDataOut():
@@ -144,7 +154,7 @@ def sayoutput():
   uirun()
   
 
-getWeather()
+dice()
   #Now for the fun stuff
 # while keepRuning == True:
 #   try:
