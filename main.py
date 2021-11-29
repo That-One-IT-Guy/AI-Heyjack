@@ -14,6 +14,7 @@ import struct
 import random
 import pygame
 import time
+import sys
 import os
 
 pygame.init()
