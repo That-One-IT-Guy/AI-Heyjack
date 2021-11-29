@@ -1,3 +1,4 @@
+from PyDictionary import PyDictionary
 from datetime import datetime
 from threading import Thread
 from pygame.locals import *
@@ -6,6 +7,7 @@ import speech_recognition as sr
 import requests, json
 import pvporcupine
 import playsound
+import requests
 import pyaudio
 import pyttsx3
 import struct
@@ -86,15 +88,20 @@ def getSTT():
   r = sr.Recognizer()
   with sr.Microphone() as source:
     print("Talk")
+    pygame.mixer.init()
+    pygame.mixer.music.load('ding.mp3')
+    pygame.mixer.music.play()
     audio_text = r.listen(source)
     print("Time over, thanks")
     
     try:
+      if not str(audio_text) == "" or " ":
         textdata = r.recognize_google(audio_text)
         rawOut = textdata
         getCom()
-    except Exception as e:
-         print(e)
+    except:
+      e = sys.exc_info()[0]
+      print(e)
 
 
 
@@ -117,6 +124,18 @@ def getCom():
     getWeather()
   elif "dice" in rawOut:
     getDice()
+  elif "coin" and "flip" in rawOut:
+    getFlip()
+  elif "bitcoin" and "price" in rawOut:
+    getBitcoin()
+  elif "definition" in rawOut:
+    getDef()
+  elif "stop" in rawOut:
+    getStop()
+  elif "help" in rawOut:
+    getHelp()
+  elif "joke" in rawOut:
+    getJoke()
   else:
     print("Command not found!")
 
@@ -160,6 +179,56 @@ def getDice():
   output = str("The dice rolled on a " + str((random.randint(1, 6))))
   printDataOut()
 
+def getFlip():
+  global output
+  flip = random.randint(1, 2)
+  if flip == 1:
+    output = "You got tails!"
+    bypassTTSValue = "You got tails"
+    bypassTTS = True
+  else:
+    output = "You got heads!"
+    bypassTTSValue = "You got heads"
+    bypassTTS = True
+  printDataOut()
+
+def getBitcoin():
+  global output
+  global bypassTTS
+  global bypassTTSValue
+  response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json')
+  data = response.json()
+  output = "The current price for bitcoin is, $" + str(data["bpi"]["USD"]["rate"])
+  bypassTTSValue = "The current price for bitcoin is " + str(data["bpi"]["USD"]["rate"]) + " dollars"
+  bypassTTS = True
+  printDataOut()
+  
+def getDef():
+  global output
+  global rawOut
+  word = rawOut.split()
+  word = (word[-1])
+  dictionary=PyDictionary()
+  definitionData = dictionary.meaning(word)
+  output = "The definition of " + str(word) + " is: " + str(definitionData)
+  printDataOut()
+  
+def getStop():
+  global output
+  output = " "
+  printDataOut()
+
+def getHelp():
+  global output
+  output = "The help command is not ready yet."
+  printDataOut()
+  
+def getJoke():
+  global output
+  lines = open('jokes.txt').read().splitlines()
+  output = random.choice(lines)
+  printDataOut()
+  
 #testing purposes only!
 
 def printDataOut():
@@ -198,6 +267,7 @@ def sayoutput():
 #ui
 
 def uiRun():
+  infoObject = pygame.display.Info()
   screen = pygame.display.set_mode((500, 500), RESIZABLE)
   # Run until the user asks to quit
   global output
@@ -212,6 +282,7 @@ def uiRun():
   ih = carImg.get_height()
   iw = carImg.get_width()
   outCheck = ""
+  fullMode = False
   while running:
     if not outCheck == output:
       if not outCheck == "":
@@ -221,11 +292,26 @@ def uiRun():
         ti = 0
         th = 0
     outCheck = output
+    if pygame.key.get_pressed()[K_f]:
+      if fullMode == False:
+        fullMode = True
+        pygame.display.set_mode((infoObject.current_w, infoObject.current_h), pygame.FULLSCREEN)
+        time.sleep(0.5)
+      else:
+        fullMode = False
+        pygame.display.quit()
+        screen = pygame.display.set_mode((500, 500), pygame.RESIZABLE)
+        pygame.display.init()
+        time.sleep(0.5)
     w, h = pygame.display.get_surface().get_size()
     # Did the user click the window close button?
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    if event.type == pygame.MOUSEMOTION:
+      pygame.mouse.set_visible(True)
+    else:
+      pygame.mouse.set_visible(False)
     # Fill the background
     screen.fill((5,1,23))
       
@@ -266,4 +352,4 @@ def uiRun():
 if __name__ == '__main__':
   Thread(target = uiRun).start()
   Thread(target = getWake).start()
-  
+ 
