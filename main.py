@@ -1,3 +1,4 @@
+from PyDictionary import PyDictionary
 from datetime import datetime
 from threading import Thread
 from pygame.locals import *
@@ -125,6 +126,10 @@ def getCom():
     getFlip()
   elif "bitcoin" and "price" in rawOut:
     getBitcoin()
+  elif "definition" in rawOut:
+    getDef()
+  elif "stop" in rawOut:
+    getStop()
   else:
     print("Command not found!")
 
@@ -190,6 +195,19 @@ def getBitcoin():
   output = "The current price for bitcoin is, $" + str(int(data["bpi"]["USD"]["rate"]))
   bypassTTSValue = "The current price for bitcoin is " + str(int(data["bpi"]["USD"]["rate"])) + "dollars"
   bypassTTS = True
+  
+def getDef():
+  global output
+  global rawOut
+  word = rawOut.split()
+  word = (word[-1])
+  dictionary=PyDictionary()
+  definitionData = dictionary.meaning(word)
+  output = "The definition of " + str(word) + " is: " + str(definitionData)
+  
+def getStop():
+  output = " "
+
 #testing purposes only!
 
 def printDataOut():
