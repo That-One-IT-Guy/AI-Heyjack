@@ -130,6 +130,10 @@ def getCom():
     getDef()
   elif "stop" in rawOut:
     getStop()
+  elif "help" in rawOut:
+    getHelp()
+  elif "joke" in rawOut:
+    getJoke()
   else:
     print("Command not found!")
 
@@ -195,6 +199,7 @@ def getBitcoin():
   output = "The current price for bitcoin is, $" + str(int(data["bpi"]["USD"]["rate"]))
   bypassTTSValue = "The current price for bitcoin is " + str(int(data["bpi"]["USD"]["rate"])) + "dollars"
   bypassTTS = True
+  printDataOut()
   
 def getDef():
   global output
@@ -204,10 +209,24 @@ def getDef():
   dictionary=PyDictionary()
   definitionData = dictionary.meaning(word)
   output = "The definition of " + str(word) + " is: " + str(definitionData)
+  printDataOut()
   
 def getStop():
+  global output
   output = " "
+  printDataOut()
 
+def getHelp():
+  global output
+  output = "The help command is not ready yet."
+  printDataOut()
+  
+def getJoke():
+  global output
+  lines = open('jokes.txt').read().splitlines()
+  output = random.choice(lines)
+  printDataOut()
+  
 #testing purposes only!
 
 def printDataOut():
