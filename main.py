@@ -26,11 +26,12 @@ global bypassTTS
 global bypassTTSValue
 global API_KEY
 global URL
+global fullMode
 
 keepRuning = True
 currentFace = "None"
 rawOut = ""
-output = "System still starting!"
+output = "Press f to toggle fullscreen."
 outCheckWarn = False
 bypassTTS = False
 bypassTTSValue = ""
@@ -42,6 +43,7 @@ engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
 engine.setProperty('rate', 140)
+fullMode = False
 
 #check for wake word
 
@@ -229,7 +231,8 @@ def getJoke():
   lines = open('jokes.txt').read().splitlines()
   output = random.choice(lines)
   printDataOut()
-  
+
+
 #testing purposes only!
 
 def printDataOut():
@@ -244,6 +247,7 @@ def sayoutput():
   global outCheckWarn
   global bypassTTS
   global bypassTTSValue
+  global fullMode
   language = 'en'
   if bypassTTS == True:
     print("TTS Override! New Value = " + bypassTTSValue)
@@ -252,7 +256,10 @@ def sayoutput():
     bypassTTS = False
   else:
     myobj = gTTS(text=output, lang=language, slow=False)
-    myobj.save("temp.mp3")
+    try:
+      myobj.save("temp.mp3")
+    except:
+      print("Save error")
   pygame.mixer.init()
   pygame.mixer.music.load('temp.mp3')
   pygame.mixer.music.play()
@@ -273,8 +280,9 @@ def uiRun():
   # Run until the user asks to quit
   global output
   global outCheckWarn
+  global fullMode
   running = True
-  font = pygame.font.Font('Amfallen.ttf', 32)
+  font = pygame.font.Font('Akrobat-ExtraBold.ttf', 36)
   th = 0
   a = 255
   ti = 0
@@ -283,7 +291,6 @@ def uiRun():
   ih = carImg.get_height()
   iw = carImg.get_width()
   outCheck = ""
-  fullMode = False
   while running:
     if not outCheck == output:
       if not outCheck == "":
